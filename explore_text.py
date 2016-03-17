@@ -7,7 +7,8 @@ from __future__ import division
 import csv
 import re
 import nltk
-
+import sklearn
+import numpy
 
 def get_formatted_csv(filename):
   with open(filename, 'r') as csvfile:
@@ -29,17 +30,45 @@ def get_full_text_description(row_list):
   text = nltk.Text(tokens)
   return text
 
+def get_word_count_dict(text_description):
+  word_count = {}
+  tokens = nltk.word_tokenize(text_description)
+  print tokens
+  for word in tokens:
+    word_count[word] = word_count.get(word, 0) + 1
+  return word_count
+
+def get_training_set(input_data):
+  y = numpy.array([row['SalaryNormalized'] for row in input_data])
+  x = [get_word_count_dict(row['FullDescription']) for row in input_data]
+  return x, y
+
 def get_vocab(text):
   words = [word.lower() for word in text]
   vocab = sorted(set(words))
   return vocab
 
+def convert_dict_list_to_sparse_matrix(dict_list):
+  vec = sklearn.feature_extraction.DictVectorizer()
+  words_vectorized = vec.fit_transform(dict_list)
+  print vec.get_feature_names()
+  return words_vectorized
+
+def fit_sgd_regressor(x, y):
+  clf = sklearn.linear_model.SGDRegressor()
+  clf.fit(x, y)
+  return clf
 
 def main():
-  formatted_data = get_formatted_csv('train_mini.csv')
+  formatted_data = get_formatted_csv('data/train_mini.csv')
   full_text = get_full_text_description(formatted_data)
-  print get_vocab(full_text)
+  x, y = get_training_set(formatted_data)
+  new_x = convert_dict_list_to_sparse_matrix(x)
 
+  sgd = fit_sgd_regressor(new_x, y)
+  print sgd
+  print y
+  print sgd.predict(new_x)
 
 if __name__ == "__main__":
     # execute only if run as a script
