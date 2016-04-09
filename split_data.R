@@ -12,12 +12,21 @@ data<-read.csv(paste0(data_folder, "/", "Train_rev1.csv"),
 data$DescriptionLength <- nchar(data$FullDescription)
 
 # Examine the distribution of  Description Length
-qplot(data$DescriptionLength, geom="histogram")
+qplot(data$DescriptionLength, geom="histogram", xlab="Full 
+      Text Description Length (number of characters)", main=
+        "Histogram of Job Description Length")
 # Examine quantiles. 
-quantile(data$DescriptionLength, c(0,0.01,0.5,0.99,1.0))
+quantile(data$DescriptionLength, c(0, 0.01, 0.5, 0.99, 1.0))
 
 # Look at the distribution of the log of Description Length.
 qplot(log(data$DescriptionLength), geom="histogram")
+
+# Tidy the FullDescription
+no_punctuation<-gsub("[/.,><():*0-9;&]", " ",
+                     data$FullDescription)
+all_text<-paste(no_punctuation)
+words<- word(all_text)
+unique_words<-unique(words)
 
 # Location rollup information. Also provided by Kaggle.
 location_tree<- read.csv(paste0(data_folder, "/",
@@ -34,7 +43,7 @@ binom<-rbinom(nrow(data), 1, p=.2)
 train_data <- data[binom==0,]
 test_data <- data[binom==1,]
 
-
+# For writing scripts with limited memory usage for fast iterations.
 write.csv(train_data[1:10,], "train_mini.csv", row.names=FALSE)
 
 write.csv(train_data, "train.csv", row.names=FALSE)
