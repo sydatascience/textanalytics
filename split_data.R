@@ -1,5 +1,32 @@
+library("stringr")
+library("ggplot2")
+options(stringsAsFactors = FALSE)
+
 setwd("~/textanalytics/")
-data<-read.csv("Train_rev1.csv",stringsAsFactors=FALSE)
+
+data_folder <- "data"
+
+# Training Set data.
+data<-read.csv(paste0(data_folder, "/", "Train_rev1.csv"),
+               stringsAsFactors=FALSE)
+data$DescriptionLength <- nchar(data$FullDescription)
+
+# Examine the distribution of  Description Length
+qplot(data$DescriptionLength, geom="histogram")
+# Examine quantiles. 
+quantile(data$DescriptionLength, c(0,0.01,0.5,0.99,1.0))
+
+# Look at the distribution of the log of Description Length.
+qplot(log(data$DescriptionLength), geom="histogram")
+
+# Location rollup information. Also provided by Kaggle.
+location_tree<- read.csv(paste0(data_folder, "/",
+                                "Location_Tree.csv"),
+                         stringsAsFactors=FALSE)
+
+loc<-strsplit(location_tree[, 1], split="~")
+dd<-do.call(rbind.data.frame, loc)
+colnames(dd)<-paste0("Location", 1:7)
 
 set.seed(23)
 binom<-rbinom(nrow(data), 1, p=.2)
