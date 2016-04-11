@@ -22,11 +22,11 @@ quantile(data$DescriptionLength, c(0, 0.01, 0.5, 0.99, 1.0))
 qplot(log(data$DescriptionLength), geom="histogram")
 
 # Tidy the FullDescription
-no_punctuation<-gsub("[/.,><():*0-9;&]", " ",
+# no_punctuation<-gsub("[/.,><():*0-9;&]", " ",
                      data$FullDescription)
-all_text<-paste(no_punctuation)
-words<- word(all_text)
-unique_words<-unique(words)
+# all_text<-paste(no_punctuation)
+# words<- word(all_text)
+# unique_words<-unique(words)
 
 # Location rollup information. Also provided by Kaggle.
 location_tree<- read.csv(paste0(data_folder, "/",
@@ -41,10 +41,18 @@ set.seed(23)
 binom<-rbinom(nrow(data), 1, p=.2)
 
 train_data <- data[binom==0,]
-test_data <- data[binom==1,]
+# Shuffle
+train_data<-train_data[sample(nrow(train_data)),]
 
+test_data <- data[binom==1,]
+# Shuffe
+test_data<-test_data[sample(nrow(test_data)),]
+
+
+setwd("data/")
 # For writing scripts with limited memory usage for fast iterations.
-write.csv(train_data[1:10,], "train_mini.csv", row.names=FALSE)
+write.csv(train_data[1:50,], "train_mini.csv", row.names=FALSE)
+write.csv(train_data[1:10000,], "train_medium.csv", row.names=FALSE)
 
 write.csv(train_data, "train.csv", row.names=FALSE)
 write.csv(test_data, "test.csv", row.names=FALSE)

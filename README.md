@@ -1,2 +1,2 @@
-# textanalytics
-Exploring NLTK with an old Kaggle dataset for predicting salary
+# Text Analytics
+Exploring an old Kaggle dataset for predicting salary.
