@@ -56,7 +56,7 @@ def main():
 
   full_text = X_train['FullDescription']  
   count_vect = sklearn.feature_extraction.text.CountVectorizer(
-    stop_words='english', min_df=1)
+    stop_words='english', min_df=10)
   X_train_counts = count_vect.fit_transform(full_text)
   Y_train_counts =count_vect.transform(X_test['FullDescription'])
   print(X_train_counts.shape)
@@ -66,23 +66,23 @@ def main():
   average_guess = numpy.empty(y_test.shape)
   average_guess.fill(numpy.mean(Y_train))
   print('Guess value is %s' % average_guess)
-
+  average_guess_mae = sklearn.metrics.mean_absolute_error(y_test, average_guess)
+  print('Guess the average Mean Absolute Error: {:10.4f}'.format(average_guess_mae))
+  
   # We want a stochastic gradient descent with l1 norm.
   sgd = sklearn.linear_model.SGDRegressor(penalty='l1', n_iter=100)
   sgd.fit(X_train_counts, Y_train)
   sgd_predictions = sgd.predict(Y_train_counts)
-
+  sgd_mae = sklearn.metrics.mean_absolute_error(y_test, sgd_predictions)
+  print('SGDRegressor Mean Absolute Error: {:10.4f}'.format(sgd_mae))
+  
   # Random Forest.
-  rf = sklearn.ensemble.RandomForestRegressor(n_estimators=100)
+  rf = sklearn.ensemble.RandomForestRegressor(n_estimators=10)
   rf.fit(X_train_counts, Y_train)
   rf_predictions = rf.predict(Y_train_counts)
 
   # Mean Absolute Error
-  average_guess_mae = sklearn.metrics.mean_absolute_error(y_test, average_guess)
-  sgd_mae = sklearn.metrics.mean_absolute_error(y_test, sgd_predictions)
   rf_mae = sklearn.metrics.mean_absolute_error(y_test, rf_predictions)
-  print('Guess the average Mean Absolute Error: {:10.4f}'.format(average_guess_mae))
-  print('SGDRegressor Mean Absolute Error: {:10.4f}'.format(sgd_mae))
   print('Random Forest Regressor Mean Absolute Error: {:10.4f}'.format(rf_mae))
 
 
