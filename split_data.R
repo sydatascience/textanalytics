@@ -1,3 +1,4 @@
+# DEPRECATED. Please use  split_data.py. This file will be removed soon.
 library("stringr")
 library("ggplot2")
 options(stringsAsFactors = FALSE)

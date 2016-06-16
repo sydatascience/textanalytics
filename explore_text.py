@@ -14,6 +14,7 @@ import numpy
 import pandas
 import scipy
 import sklearn
+# This is because I was getting an error importing random forest in line.
 import sklearn.ensemble
 
 def get_full_text_description(row_list):
@@ -50,7 +51,7 @@ def main():
   X_train_index, X_test_index, Y_train, y_test = sklearn.cross_validation.train_test_split(
       data.index, data['SalaryNormalized'], test_size=.33, random_state=42)
 
-  #This is to keep them as pandas dataframes.
+  # Keep train and test as pandas dataframes.
   X_train = data.iloc[X_train_index]
   X_test = data.iloc[X_test_index]
 
