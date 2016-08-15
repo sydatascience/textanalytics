@@ -1,5 +1,6 @@
 #!/usr/bin/python
-"""Docstring
+"""Deprecated. This file is deprcated and will be removed. Please use
+ exploratory_analysis.ipynb instead.
 """
 # To default to float division and print function.
 from __future__ import (division, print_function)
