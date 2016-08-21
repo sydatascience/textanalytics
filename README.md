@@ -8,3 +8,5 @@ Scikit Learn
 TensorFlow
 TFLearn
 Jupityer Notebooks
+lda https://pypi.python.org/pypi/lda
+
