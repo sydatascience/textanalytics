@@ -25,4 +25,4 @@ def get_lda_training_data(file_name, column_name, min_word_frequency=1):
   bag_of_words = count_vect.fit_transform(column)
 
 
-  return (bag_of_words, count_vect.get_feature_names()) 
+  return (bag_of_words, count_vect.get_feature_names())
