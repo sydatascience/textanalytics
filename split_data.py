@@ -3,6 +3,7 @@
 import pandas
 import numpy
 import os
+import re
 
 DATA_DIRECTORY = '~/textanalytics/data'
 INPUT_DATA_FILE = 'Train_rev1.csv'
@@ -33,6 +34,13 @@ data["ContractType"] = data["ContractType"].fillna(PLACEHOLDER_NA_VALUE)
 # Add new transformed/calculated fields
 data['DescriptionLength'] = data['FullDescription'].str.len()
 data['LogSalaryNormalized'] = numpy.log(data['SalaryNormalized'])
+
+# Clean FullDescription field.
+# Split slashed words. e.g.  "computer/software" with computer software
+data["FullDescription"] = data["FullDescription"].str.replace(r'(\w+)\/(\w+)', r'\1 \2')
+
+#Remove common pattern JobSeeking/SupportEngineerAnalystExchangeWindowsServerAD_job****
+data["FullDescription"] = data["FullDescription"].str.replace(r'JobSeeking/([\w*]+)_job\*{4}', r'\1')
 
 
 # Appending title to full descripton makes sure it is present in all cases. 
