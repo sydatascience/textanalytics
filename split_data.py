@@ -47,7 +47,7 @@ def clean_free_text_field(column):
   new_column = new_column.str.replace(r'\[([^\]]+)\]', r'\1')
 
   # Replace Punctuation characters with white space , ; / -
-  new_column = new_column.str.replace(r'[,;:/\|–?()\[\]{}]', r' ')
+  new_column = new_column.str.replace(r'[,;:/\|–?()\[\]{}\'"<>]', r' ')
 
   # Split words from "**** pattern"
   new_column = new_column.str.replace(r'([\w]+)(\*{4})', r'\1 \2 ')
