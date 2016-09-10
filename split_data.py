@@ -1,4 +1,5 @@
 #! /usr/bin/python
+# -*- coding: utf-8 -*-
 
 import pandas
 import numpy
@@ -25,7 +26,7 @@ PLACEHOLDER_NA_VALUE = "unknown_value"
 # Fill missing values.
 # This needs to be done as otherwise null/Nan/NA values will raise errors where
 # we are expecting strings in our categorical variables
-data["Title"] = data["Title"].fillna(PLACEHOLDER_NA_VALUE)
+data["TitleRaw"] = data["Title"].fillna(PLACEHOLDER_NA_VALUE)
 data["Company"] = data["Company"].fillna(PLACEHOLDER_NA_VALUE)
 data["SourceName"] = data["SourceName"].fillna(PLACEHOLDER_NA_VALUE)
 data["ContractTime"] = data["ContractTime"].fillna(PLACEHOLDER_NA_VALUE)
@@ -34,6 +35,36 @@ data["ContractType"] = data["ContractType"].fillna(PLACEHOLDER_NA_VALUE)
 # Add new transformed/calculated fields
 data['DescriptionLength'] = data['FullDescription'].str.len()
 data['LogSalaryNormalized'] = numpy.log(data['SalaryNormalized'])
+
+def clean_free_text_field(column):
+  # Split slashed words into two distinct tokens
+  new_column = column.str.replace(r'(\w+)\/(\w+)', r'\1 \2')
+  # Split ampersanded words into two distinct tokens
+  new_column = new_column.str.replace(r'(\w{2,})&(\w{2,})', r'\1 \2')
+
+  # Remove all brackets emptying their contents.
+  new_column = new_column.str.replace(r'\(([^)]+)\)', r'\1')
+  new_column = new_column.str.replace(r'\[([^\]]+)\]', r'\1')
+
+  # Replace Punctuation characters with white space , ; / -
+  new_column = new_column.str.replace(r'[,;:/\|–?()\[\]{}]', r' ')
+
+  # Split words from "**** pattern"
+  new_column = new_column.str.replace(r'([\w]+)(\*{4})', r'\1 \2 ')
+  new_column = new_column.str.replace(r'(\*{4})([\w]+)', r'\1 \2 ')
+
+  # Replace all k patterns with capital k. also replace doubles.
+  new_column = new_column.str.replace(r'(?i)\*{4}k( \*{4} k)?', r'****K')
+  
+  new_column = new_column.str.replace(r'(\*{4}K)([\w]+)', r'\1 \2')
+
+  # Correct some words
+  new_column = new_column.str.replace(r'bonusbenefits', r'bonus benefits')
+  # Remove duplicate spaces
+  new_column = new_column.str.replace(r'\s+', r' ')
+  return new_column
+
+data['Title'] = clean_free_text_field(data['TitleRaw']) 
 
 # Clean FullDescription field.
 # Split slashed words. e.g.  "computer/software" with computer software
