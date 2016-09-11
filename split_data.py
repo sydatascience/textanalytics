@@ -47,7 +47,9 @@ def clean_free_text_field(column):
   new_column = new_column.str.replace(r'\[([^\]]+)\]', r'\1')
 
   # Replace Punctuation characters with white space , ; / -
-  new_column = new_column.str.replace(r'[,;:/\|–?()\[\]{}\'"<>]', r' ')
+
+  new_column = new_column.str.replace(r'(\w)[\'`](\w)', r'\1\2')
+  new_column = new_column.str.replace(r'[,;:/\|–?()\[\]{}\'"<>�]', r' ')
 
   # Split words from "**** pattern"
   new_column = new_column.str.replace(r'([\w]+)(\*{4})', r'\1 \2 ')
@@ -62,6 +64,65 @@ def clean_free_text_field(column):
   new_column = new_column.str.replace(r'bonusbenefits', r'bonus benefits')
   # Remove duplicate spaces
   new_column = new_column.str.replace(r'\s+', r' ')
+
+  # Spelling mistakes
+  new_column = new_column.str.replace(r'Excellent?', r'Excellent')
+  new_column = new_column.str.replace(r'Operationa(al)?', r'Operational')
+  new_column = new_column.str.replace(r'Switzerla(nd)?', r'Switzerland')
+  new_column = new_column.str.replace(r'progammer', r'programmer')
+  new_column = new_column.str.replace(r'Progamming', r'Programming')
+  new_column = new_column.str.replace(r'Registerd', r'Registered')
+  new_column = new_column.str.replace(r'Technician?', r'Technician')
+  new_column = new_column.str.replace(r'Develpoer', r'Developer')
+  new_column = new_column.str.replace(r'Administraotr|Administartor', r'Administrator')
+  new_column = new_column.str.replace(r'Restauarnt', r'Restauarnt')
+  new_column = new_column.str.replace(r'Eneigneer', r'Engineer')
+
+
+  new_column = new_column.str.replace(r'(\d+) %', r'\1%')
+  new_column = new_column.str.replace(r'(\w+)(\d+%)', r'\1 \2')
+  # Replace some 10%bonus with 10% bonus
+  new_column = new_column.str.replace(r'(\d+%)(\w+)', r'\1 \2')
+
+  new_column = new_column.str.replace(r'FinanceCheshire', r'Finance Cheshire')
+  new_column = new_column.str.replace(r'ManufacturingCoventry', r'Manufacturing Coventry')
+
+  new_column = new_column.str.replace(r'RESTAURANTNEWCASTLE', r'Restaurant Newcastle')
+  new_column = new_column.str.replace(r'RESTAURANTHALIFAX', r'Restaurant Halifax')
+  new_column = new_column.str.replace(r'Keynesexciting', r'Keynes exciting')
+
+  new_column = new_column.str.replace(r'C\+{2}Software', r'C++ Software')
+  new_column = new_column.str.replace(r'PHPunit', r'PHP unit')
+
+
+
+  new_column = new_column.str.replace(r'(?i)(Manager)(\w+)', r'\1 \2')
+
+  # Multi words concated can be split by their capitals.
+  new_column = new_column.str.replace(r'([a-z]+)([A-Z][a-z]+)', r'\1 \2')
+  new_column = new_column.str.replace(r'Availab(le)?', r'Available')
+
+  new_column = new_column.str.replace(r'Adminstration', r'Administration')
+  new_column = new_column.str.replace(r'Adminstrative', r'Administrative')
+  new_column = new_column.str.replace(r'recuitment', r'recruitment')
+  new_column = new_column.str.replace(r'Proffesional', r'Professional')
+
+
+  new_column = new_column.str.replace(r'TransformLoad', r'Transform Load')
+  new_column = new_column.str.replace(r'Productdeveloper', r'Product Developer')
+  new_column = new_column.str.replace(r'BelfastGlasgow', r'Belfast Glasgow')
+  new_column = new_column.str.replace(r'PROVIDEDCORK', r'Provided Cork')
+  new_column = new_column.str.replace(r'ChildcareNO', r'Childcare NO')
+  new_column = new_column.str.replace(r'AfterChildren', r'After Children')
+  new_column = new_column.str.replace(r'Homeworking', r'Home Working')
+  new_column = new_column.str.replace(r'BallymenaFantastic', r'Ballymena Fantastic')
+  new_column = new_column.str.replace(r'PermLondon', r'Perm London')
+  new_column = new_column.str.replace(r'(\w+)(RGN)', r'\1 \2')
+  new_column = new_column.str.replace(r'(RGN)(\w+)', r'\1 \2')
+  new_column = new_column.str.replace(r'kOTE', r'k OTE')
+  new_column = new_column.str.replace(r'Germanspeaking', r'German speaking')
+  new_column = new_column.str.replace(r'Availableility', r'Availability')
+
   return new_column
 
 data['Title'] = clean_free_text_field(data['TitleRaw']) 
