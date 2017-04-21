@@ -1,5 +1,4 @@
-#! /usr/bin/python
-# -*- coding: utf-8 -*-
+#! /usr/bin/python3
 
 import pandas
 import numpy
@@ -25,7 +24,7 @@ PLACEHOLDER_NA_VALUE = "unknown_value"
 
 # Fill missing values.
 # This needs to be done as otherwise null/Nan/NA values will raise errors where
-# we are expecting strings in our categorical variables
+# we are expecting strings in our categorical variables later
 data["TitleRaw"] = data["Title"].fillna(PLACEHOLDER_NA_VALUE)
 data["Company"] = data["Company"].fillna(PLACEHOLDER_NA_VALUE)
 data["SourceName"] = data["SourceName"].fillna(PLACEHOLDER_NA_VALUE)
@@ -57,7 +56,7 @@ def clean_free_text_field(column):
 
   # Replace all k patterns with capital k. also replace doubles.
   new_column = new_column.str.replace(r'(?i)\*{4}k( \*{4} k)?', r'****K')
-  
+
   new_column = new_column.str.replace(r'(\*{4}K)([\w]+)', r'\1 \2')
 
   # Correct some words
@@ -74,7 +73,8 @@ def clean_free_text_field(column):
   new_column = new_column.str.replace(r'Registerd', r'Registered')
   new_column = new_column.str.replace(r'Technician?', r'Technician')
   new_column = new_column.str.replace(r'Develpoer', r'Developer')
-  new_column = new_column.str.replace(r'Administraotr|Administartor', r'Administrator')
+  new_column = new_column.str.replace(r'Administraotr|Administartor',
+                                      r'Administrator')
   new_column = new_column.str.replace(r'Restauarnt', r'Restauarnt')
   new_column = new_column.str.replace(r'Eneigneer', r'Engineer')
 
@@ -85,14 +85,20 @@ def clean_free_text_field(column):
   new_column = new_column.str.replace(r'(\d+%)(\w+)', r'\1 \2')
 
   new_column = new_column.str.replace(r'FinanceCheshire', r'Finance Cheshire')
-  new_column = new_column.str.replace(r'ManufacturingCoventry', r'Manufacturing Coventry')
+  new_column = new_column.str.replace(r'ManufacturingCoventry',
+                                      r'Manufacturing Coventry')
 
-  new_column = new_column.str.replace(r'RESTAURANTNEWCASTLE', r'Restaurant Newcastle')
-  new_column = new_column.str.replace(r'RESTAURANTHALIFAX', r'Restaurant Halifax')
-  new_column = new_column.str.replace(r'Keynesexciting', r'Keynes exciting')
+  new_column = new_column.str.replace(r'RESTAURANTNEWCASTLE',
+                                      r'Restaurant Newcastle')
+  new_column = new_column.str.replace(r'RESTAURANTHALIFAX',
+                                      r'Restaurant Halifax')
+  new_column = new_column.str.replace(r'Keynesexciting',
+                                      r'Keynes exciting')
 
-  new_column = new_column.str.replace(r'C\+{2}Software', r'C++ Software')
-  new_column = new_column.str.replace(r'PHPunit', r'PHP unit')
+  new_column = new_column.str.replace(r'C\+{2}Software',
+                                      r'C++ Software')
+  new_column = new_column.str.replace(r'PHPunit',
+                                      r'PHP unit')
 
 
 
@@ -115,7 +121,8 @@ def clean_free_text_field(column):
   new_column = new_column.str.replace(r'ChildcareNO', r'Childcare NO')
   new_column = new_column.str.replace(r'AfterChildren', r'After Children')
   new_column = new_column.str.replace(r'Homeworking', r'Home Working')
-  new_column = new_column.str.replace(r'BallymenaFantastic', r'Ballymena Fantastic')
+  new_column = new_column.str.replace(r'BallymenaFantastic',
+                                      r'Ballymena Fantastic')
   new_column = new_column.str.replace(r'PermLondon', r'Perm London')
   new_column = new_column.str.replace(r'(\w+)(RGN)', r'\1 \2')
   new_column = new_column.str.replace(r'(RGN)(\w+)', r'\1 \2')
@@ -125,17 +132,20 @@ def clean_free_text_field(column):
 
   return new_column
 
-data['Title'] = clean_free_text_field(data['TitleRaw']) 
+data['Title'] = clean_free_text_field(data['TitleRaw'])
 
 # Clean FullDescription field.
 # Split slashed words. e.g.  "computer/software" with computer software
-data["FullDescription"] = data["FullDescription"].str.replace(r'(\w+)\/(\w+)', r'\1 \2')
+data["FullDescription"] = data["FullDescription"].str.replace(
+    r'(\w+)\/(\w+)', r'\1 \2')
 
-#Remove common pattern JobSeeking/SupportEngineerAnalystExchangeWindowsServerAD_job****
-data["FullDescription"] = data["FullDescription"].str.replace(r'JobSeeking/([\w*]+)_job\*{4}', r'\1')
+# Remove common recurring pattern
+# JobSeeking/SupportEngineerAnalystExchangeWindowsServerAD_job****
+data["FullDescription"] = data["FullDescription"].str.replace(
+    r'JobSeeking/([\w*]+)_job\*{4}', r'\1')
 
 
-# Appending title to full descripton makes sure it is present in all cases. 
+# Appending title to full descripton makes sure it is present in all cases.
 data["FullDescriptionWithTitle"] = data["Title"] + " " + data["FullDescription"]
 
 
