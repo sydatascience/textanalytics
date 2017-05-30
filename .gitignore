@@ -2,6 +2,8 @@
 .RData
 .Rhistory
 /data/*
+/logs/*
+/model_checkpoints/*
 /pickles/*
 *.swp
 .ipynb*/*
