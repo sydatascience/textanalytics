@@ -2,15 +2,13 @@
 Exploring an old Kaggle dataset for predicting salary.
 
 ## Requirements:
-Python 2.7
+Python 3.5
 
 Numpy
 
 Scikit Learn
 
 TensorFlow
-
-TFLearn
 
 Jupityer Notebooks
 
