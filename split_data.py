@@ -9,6 +9,16 @@ DATA_DIRECTORY = '~/textanalytics/data'
 INPUT_DATA_FILE = 'Train_rev1.csv'
 TESTING_PROPORTION = .3
 
+#COMPLETE_JOB_LISTING_TEMPLATE = """
+#  Job Title: %s\n
+#  Location: %s\n
+#  Company: %s\n
+#  Category: %s\n
+#  Contract Type: %s\n
+#  Contract Time: %s\n
+#  Full Description: %s
+#  """
+
 # TODO (any): Make this check if the required files and data directory exist.
 # If not then create/download them.
 
@@ -148,6 +158,9 @@ data["FullDescription"] = data["FullDescription"].str.replace(
 # Appending title to full descripton makes sure it is present in all cases.
 data["FullDescriptionWithTitle"] = data["Title"] + " " + data["FullDescription"]
 
+# CompleteJobListing field.
+#data["CompleteJobListing"] = COMPLETE_JOB_LISTING_TEMPLATE % (
+#        data['Title'], data[], ) 
 
 # Remove uncleaned messy salary field.
 data.drop('SalaryRaw', axis=1)
@@ -172,4 +185,3 @@ training_set.head(20000).to_csv('train_large.csv', index=False)
 # Write out full training and test sets
 training_set.to_csv('train.csv', index=False)
 testing_set.to_csv('test.csv', index=False)
-
