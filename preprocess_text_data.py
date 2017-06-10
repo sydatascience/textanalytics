@@ -47,4 +47,3 @@ def create_job_listing_string(file_name):
   return complete_listing
 
 #create_job_listing_string("train.csv")
-get_lda_training_data('train_mini.csv', 'Title', 3)
