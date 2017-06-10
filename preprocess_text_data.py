@@ -25,7 +25,7 @@ def get_lda_training_data(file_name, column_name, min_word_frequency=1):
   column = data[column_name]
 
   count_vect = CountVectorizer(
-    stop_words='english', min_df=min_word_frequency)
+    stop_words='english', min_df=min_word_frequency, analyzer='word')
 
   bag_of_words = count_vect.fit_transform(column)
 
@@ -47,3 +47,4 @@ def create_job_listing_string(file_name):
   return complete_listing
 
 #create_job_listing_string("train.csv")
+get_lda_training_data('train_mini.csv', 'Title', 3)
