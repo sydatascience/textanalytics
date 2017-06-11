@@ -1,23 +1,15 @@
 #! /usr/bin/python3
-
+import nltk
 import pandas
 import numpy
 import os
 import re
 
 DATA_DIRECTORY = '~/textanalytics/data'
-INPUT_DATA_FILE = 'Train_rev1.csv'
-TESTING_PROPORTION = .3
 
-#COMPLETE_JOB_LISTING_TEMPLATE = """
-#  Job Title: %s\n
-#  Location: %s\n
-#  Company: %s\n
-#  Category: %s\n
-#  Contract Type: %s\n
-#  Contract Time: %s\n
-#  Full Description: %s
-#  """
+INPUT_DATA_FILE = 'Train_rev1.csv'
+
+TESTING_PROPORTION = .3
 
 # TODO (any): Make this check if the required files and data directory exist.
 # If not then create/download them.
@@ -28,23 +20,28 @@ os.chdir(os.path.expanduser(DATA_DIRECTORY))
 
 data = pandas.read_csv(
     os.path.abspath('/'.join([
-        os.getcwd(), INPUT_DATA_FILE])))
+        os.getcwd(), 'raw', INPUT_DATA_FILE])))
+print("Input data loaded")
 
-PLACEHOLDER_NA_VALUE = "unknown_value"
+PLACEHOLDER_NA_VALUE = "unknown_%s_value"
 
-# Fill missing values.
-# This needs to be done as otherwise null/Nan/NA values will raise errors where
-# we are expecting strings in our categorical variables later
-data["TitleRaw"] = data["Title"].fillna(PLACEHOLDER_NA_VALUE)
-data["Company"] = data["Company"].fillna(PLACEHOLDER_NA_VALUE)
-data["SourceName"] = data["SourceName"].fillna(PLACEHOLDER_NA_VALUE)
-data["ContractTime"] = data["ContractTime"].fillna(PLACEHOLDER_NA_VALUE)
-data["ContractType"] = data["ContractType"].fillna(PLACEHOLDER_NA_VALUE)
+def fill_na_values(data, columns):
+  for column in columns:
+    data[column] = data[column].fillna(PLACEHOLDER_NA_VALUE % column)
+
+
+na_fill_columns = ["Title", "Company", "SourceName", "ContractTime", "ContractType"]
+
+na_values = [PLACEHOLDER_NA_VALUE % value for value in na_fill_columns]
+
+fill_na_values(data, na_fill_columns)
+print("NA values filled")
 
 # Add new transformed/calculated fields
 data['DescriptionLength'] = data['FullDescription'].str.len()
 data['LogSalaryNormalized'] = numpy.log(data['SalaryNormalized'])
 
+# TODO(Any): This needs unit tests.
 def clean_free_text_field(column):
   # Split slashed words into two distinct tokens
   new_column = column.str.replace(r'(\w+)\/(\w+)', r'\1 \2')
@@ -71,6 +68,7 @@ def clean_free_text_field(column):
 
   # Correct some words
   new_column = new_column.str.replace(r'bonusbenefits', r'bonus benefits')
+
   # Remove duplicate spaces
   new_column = new_column.str.replace(r'\s+', r' ')
 
@@ -110,12 +108,12 @@ def clean_free_text_field(column):
   new_column = new_column.str.replace(r'PHPunit',
                                       r'PHP unit')
 
-
-
   new_column = new_column.str.replace(r'(?i)(Manager)(\w+)', r'\1 \2')
 
   # Multi words concated can be split by their capitals.
   new_column = new_column.str.replace(r'([a-z]+)([A-Z][a-z]+)', r'\1 \2')
+
+  # Fix comman spelling mistakes
   new_column = new_column.str.replace(r'Availab(le)?', r'Available')
 
   new_column = new_column.str.replace(r'Adminstration', r'Administration')
@@ -142,7 +140,7 @@ def clean_free_text_field(column):
 
   return new_column
 
-data['Title'] = clean_free_text_field(data['TitleRaw'])
+#data['Title'] = clean_free_text_field(data['TitleRaw'])
 
 # Clean FullDescription field.
 # Split slashed words. e.g.  "computer/software" with computer software
@@ -154,34 +152,66 @@ data["FullDescription"] = data["FullDescription"].str.replace(
 data["FullDescription"] = data["FullDescription"].str.replace(
     r'JobSeeking/([\w*]+)_job\*{4}', r'\1')
 
-
 # Appending title to full descripton makes sure it is present in all cases.
 data["FullDescriptionWithTitle"] = data["Title"] + " " + data["FullDescription"]
 
-# CompleteJobListing field.
-#data["CompleteJobListing"] = COMPLETE_JOB_LISTING_TEMPLATE % (
-#        data['Title'], data[], ) 
+data["CompleteJobListing"] = (
+  "Title: " + data["Title"] + " \n " +
+  "Location: " + data["LocationNormalized"] + " \n " +
+  "Company: " + data["Company"] + " \n " +
+  "Category: " + data["Category"] + " \n " +
+  "ContractType: " + data["ContractType"] + " \n " +
+  "ContractTime: " + data["ContractTime"] + " \n " +
+  "FullDescription: " + data["FullDescription"] + " \n ")
+print("Complete job listing field added.")
+
+target_column = "CompleteJobListing"
+
+stemmer = nltk.PorterStemmer()
+
+# Append whichever words we place in template also.
+stop_words = set(nltk.corpus.stopwords.words("english"))
+
+# Fix index error issue.
+def process_cell(cell, lower_case=True):
+  word_list = []
+  for word in cell.split(" "):
+    if word.lower() not in stop_words:
+      try:
+        word_list.append(stemmer.stem(word))
+      except IndexError:
+        word_list.append(word)
+        print("Error processing word: %s" % word)
+  value = " ".join(word_list)
+  if lower_case:
+     value = value.lower()
+  return value
+
+def process_text_column(data_frame, column, stemmer):
+  data_frame["%sStemmed" % column] = data_frame[column].apply(
+    lambda cell: process_cell(cell))
+  return data_frame["%sStemmed" % column]
+
+process_text_column(data, "CompleteJobListing", stemmer)
 
 # Remove uncleaned messy salary field.
 data.drop('SalaryRaw', axis=1)
 
-numpy.random.seed(2016)
+numpy.random.seed(2017)
 
 # Shuffle data set before splitting
 data.reindex(numpy.random.permutation(data.index))
 
-rows = numpy.random.binomial(1, 1-TESTING_PROPORTION, size=len(data)).astype(
+rows = numpy.random.binomial(1, 1 - TESTING_PROPORTION, size= len(data)).astype(
   'bool')
+
+data.reset_index()
 
 # Split data set
 training_set = data[rows]
 testing_set = data[~rows]
 
-# For writing scripts with limited memory usage for faster iterations
-training_set.head(50).to_csv('train_mini.csv', index=False)
-training_set.head(1000).to_csv('train_medium.csv', index=False)
-training_set.head(20000).to_csv('train_large.csv', index=False)
-
+print("Saving output files.")
 # Write out full training and test sets
 training_set.to_csv('train.csv', index=False)
 testing_set.to_csv('test.csv', index=False)
