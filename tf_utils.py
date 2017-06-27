@@ -1,6 +1,6 @@
 """Library of functions for use with tensorflow notebooks."""
 import numpy
-
+import sklearn
 
 def normalize_input(input_vector, train_mean, train_std):
   """Normalize input vector by minusing training mean and dividing by s.d.
@@ -40,9 +40,8 @@ def unison_shuffled_copies(x, y):
   Raises:
     AssertionError: if x and y are not of the same length.
   """
-  assert len(x) == len(y)
-  p = numpy.random.permutation(len(x))
-  return x[p], y[p]
+  assert x.shape[0] == y.shape[0]
+  return sklearn.utils.shuffle(x, y)
 
 
 # Function to generate a training batch.
@@ -66,8 +65,8 @@ def generate_batch(batch_size, number_of_batches, max_document_length,
   while batch_index < number_of_batches:
     for element_index in range(batch_size):
       # Prevents overflow.
-      data_index = ((batch_index * batch_size) + element_index) % len(input_data)
-      batch[element_index] = numpy.array(input_data[data_index])
+      data_index = ((batch_index * batch_size) + element_index) % input_data.shape[0]
+      batch[element_index] = input_data.getrow(data_index).toarray()
       labels[element_index] = input_labels[data_index]
     batch_index += 1
     yield batch, labels
