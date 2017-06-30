@@ -51,7 +51,7 @@ class TestTfUtils(unittest.TestCase):
   def test_generate_batch(self):
     input_x = numpy.array([[3, 1, 6],[9, 4, 1],[5, 6, 2],[7, 9, 6]])
     input_y = numpy.array([1, 3, 5, 11])
-    batch_generator = tf_utils.generate_batch(1, 4, 3, input_x, input_y)
+    batch_generator = tf_utils.generate_batch(1, 4, 3, input_x, input_y, False)
     for i in range(len(input_x)):
       x, y = next(batch_generator)
       numpy.testing.assert_array_equal(x, input_x[i].reshape(1,3))
