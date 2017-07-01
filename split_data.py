@@ -9,7 +9,7 @@ DATA_DIRECTORY = '~/textanalytics/data'
 
 INPUT_DATA_FILE = 'Train_rev1.csv'
 
-TESTING_PROPORTION = .3
+TESTING_PROPORTION = .2
 
 # TODO (any): Make this check if the required files and data directory exist.
 # If not then create/download them.

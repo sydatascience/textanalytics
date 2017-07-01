@@ -1,6 +1,8 @@
 """Library of functions for use with tensorflow notebooks."""
 import numpy
+import scipy
 import sklearn
+
 
 def normalize_input(input_vector, train_mean, train_std):
   """Normalize input vector by minusing training mean and dividing by s.d.
@@ -46,7 +48,7 @@ def unison_shuffled_copies(x, y):
 
 # Function to generate a training batch.
 def generate_batch(batch_size, number_of_batches, max_document_length,
-                   input_data, input_labels, sparse=True):
+                   input_data, input_labels):
   """Creates a generator that generates batches of specified size from the data.
 
   Args:
@@ -55,7 +57,6 @@ def generate_batch(batch_size, number_of_batches, max_document_length,
     max_document_length: int, how long the longest input document was.
     input_data: X data values.
     input_labels: y data labels.
-    sparse: bool of whether we are using a sparse matrix.
   Returns:
     Generator that returns tuples of the batch data and the labels.
   """
@@ -67,7 +68,7 @@ def generate_batch(batch_size, number_of_batches, max_document_length,
     for element_index in range(batch_size):
       # Prevents overflow.
       data_index = ((batch_index * batch_size) + element_index) % input_data.shape[0]
-      if sparse:
+      if type(input_data) == scipy.sparse.csr_matrix:
         batch[element_index] = input_data.getrow(data_index).toarray()
       else:
         batch[element_index] = numpy.array(input_data[data_index])
