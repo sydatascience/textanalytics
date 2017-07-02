@@ -5,6 +5,48 @@ import scipy
 import tf_utils
 
 class TestTfUtils(unittest.TestCase):
+
+  def test_MeanEsimator_single_row(self):
+    input_y = numpy.array([2, 4, 3])
+    input_x = numpy.array([1, 2, 3])
+    test_x = numpy.array([4])
+
+    mean_estimator = tf_utils.MeanEstimator()
+    mean_estimator.fit(input_x, input_y)
+    expected_y =  numpy.array([3])
+
+    numpy.testing.assert_array_almost_equal(mean_estimator.predict(test_x),
+         expected_y)
+
+  def test_MeanEsimator_multi_row(self):
+    input_y = numpy.array([5, 6, 9, 20])
+    input_x = numpy.array([1, 2, 3, 11])
+    test_x = numpy.array([4, 6, 9])
+
+    mean_estimator = tf_utils.MeanEstimator()
+    mean_estimator.fit(input_x, input_y)
+    expected_y =  numpy.array([10, 10, 10])
+
+    numpy.testing.assert_array_almost_equal(mean_estimator.predict(test_x),
+         expected_y)
+
+  def test_MeanEsimator_raises_AssertionError(self):
+    input_y = numpy.array([5, 6, 9, 20, 10])
+    input_x = numpy.array([1, 2, 3, 11])
+
+    mean_estimator = tf_utils.MeanEstimator()
+    with self.assertRaises(AssertionError):
+      mean_estimator.fit(input_x, input_y)
+
+  def test_PorterTokenizer_single_token(self):
+    tokenizer = tf_utils.PorterTokenizer()
+    self.assertEqual(tokenizer("engineers"), ["engin"])
+
+  def test_PorterTokenizer_multi_token(self):
+    tokenizer = tf_utils.PorterTokenizer()
+    expected =  ["the", "engin", "make", "softwar"]
+    self.assertEqual(tokenizer("the engineers make software"), expected)
+
   def test_normalize_input(self):
     input_vector = numpy.array([2, 2, 3, 2, 2])
     input_mean = input_vector.mean()
@@ -32,8 +74,8 @@ class TestTfUtils(unittest.TestCase):
     numpy.testing.assert_array_equal(unnormalized_output, input_vector)
 
   def test_unison_shuffled_copies(self):
-    input_x = numpy.array([[1,2],[3,4],[5,6]])
-    input_y = numpy.array([1,3,5])
+    input_x = numpy.array([[1, 2], [3, 4], [5, 6]])
+    input_y = numpy.array([1, 3, 5])
     numpy.random.seed(421)
     output_x, output_y = tf_utils.unison_shuffled_copies(input_x, input_y)
     numpy.testing.assert_array_equal(output_x, numpy.array([[1,2],[5,6],[3,4]]))

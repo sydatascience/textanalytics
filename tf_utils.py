@@ -2,6 +2,31 @@
 import numpy
 import scipy
 import sklearn
+import nltk
+
+
+class MeanEstimator(sklearn.base.BaseEstimator):
+  """Scikit type estimator that always predicts the mean training set mean."""
+  def fit(self, X, y):
+    assert X.shape[0] == y.shape[0]
+    self.mean = y.mean()
+
+  def predict(self, X):
+    return numpy.full(shape=X.shape[0], fill_value=self.mean)
+
+
+class PorterTokenizer(object):
+  """Tokenizes document and applies porter stemmer to all the words within"""
+  def __init__(self):
+    self.porter_stemmer = nltk.PorterStemmer()
+  def __call__(self, doc):
+    word_list = []
+    for word in nltk.word_tokenize(doc):
+      try:
+        word_list.append(self.porter_stemmer.stem(word))
+      except IndexError:
+        word_list.append(word)
+    return word_list
 
 
 def normalize_input(input_vector, train_mean, train_std):
