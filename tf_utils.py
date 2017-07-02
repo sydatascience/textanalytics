@@ -86,7 +86,7 @@ def generate_batch(batch_size, number_of_batches, max_document_length,
     Generator that returns tuples of the batch data and the labels.
   """
   batch = numpy.ndarray(
-    shape=(batch_size, max_document_length), dtype=numpy.int32)
+    shape=(batch_size, input_data.shape[1]), dtype=numpy.float32)
   labels = numpy.ndarray(shape=(batch_size, 1), dtype=numpy.float32)
   batch_index = 0
   while batch_index < number_of_batches:
