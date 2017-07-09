@@ -18,7 +18,7 @@ model = sklearn.decomposition.LatentDirichletAllocation(
     n_topics=30, max_iter=1000, random_state=1, learning_method='online',
     batch_size=16384, n_jobs=-1, verbose=10)
 
-model.fit_transform(X)
+lda_data = model.fit_transform(X)
 
 joblib.dump(model, 'lda_model.pkl')
 
@@ -33,5 +33,5 @@ for i, topic_dist in enumerate(topic_word):
 
 # This is, our 30 dimensional representation of the original data.
 
-df = pandas.DataFrame(topic_word)
+df = pandas.DataFrame(lda_data)
 df.to_csv('data/%s' % OUTPUT_FILE, index=False)
