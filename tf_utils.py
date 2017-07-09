@@ -6,7 +6,7 @@ import nltk
 
 
 class MeanEstimator(sklearn.base.BaseEstimator):
-  """Scikit type estimator that always predicts the mean training set mean."""
+  """Scikit type estimator that always predicts the training set mean."""
   def fit(self, X, y):
     assert X.shape[0] == y.shape[0]
     self.mean = y.mean()
