@@ -118,15 +118,21 @@ def generate_kaggle_data(min_word_frequency, X_train, X_test):
 
 if __name__ == "__main__":
   min_word_frequency = 25
-  train_data = pandas.read_csv("data/train.csv", nrows=1000) # Can read a subset. First nrows of the total.
-  generate_kaggle_data(25, train_data, train_data)
-  # This is it!
-  kaggle_file = "kaggle_output.pkl"
+  data = pandas.read_csv("data/train.csv")
+  TEST_SIZE = .2
+  LABEL_COLUMN = "SalaryNormalized"
 
-  if os.path.isfile(kaggle_file):
-      kaggle_dict = pickle.load( open(kaggle_file, "rb" ) )
-      x_train, x_test = kaggle_dict["x_train"],  kaggle_dict["x_test"]
-  else:
-      x_train, x_test = generate_kaggle_data()
-      pickle.dump({'x_train': x_train, 'x_test':x_test}, open(kaggle_file, 'wb'))
+  # sklearn.cross_validation has been replaced with model_selection.
+  X_train_index, X_test_index, Y_train, Y_test = (
+      sklearn.model_selection.train_test_split(
+          data.index, data[LABEL_COLUMN], test_size=TEST_SIZE, random_state=42))
+
+  # Keep train and test as pandas dataframes.
+  X_train = data.iloc[X_train_index]
+  X_test = data.iloc[X_test_index]
+  kaggle_file = "kaggle_output.pkl"
+  x_train, x_test = generate_kaggle_data(
+      min_word_frequency, X_train, X_test)
+  print("Data generated. Writing pickle.")
+  pickle.dump({'x_train': x_train, 'x_test':x_test}, open(kaggle_file, 'wb'))
 

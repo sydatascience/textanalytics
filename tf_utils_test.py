@@ -94,7 +94,7 @@ class TestTfUtils(unittest.TestCase):
   def test_generate_batch_dense_matrix(self):
     input_x = numpy.array([[3, 1, 6],[9, 4, 1],[5, 6, 2],[7, 9, 6]])
     input_y = numpy.array([1, 3, 5, 11])
-    batch_generator = tf_utils.generate_batch(1, 4, 3, input_x, input_y)
+    batch_generator = tf_utils.generate_batch(1, input_x, input_y)
     for i in range(len(input_x)):
       x, y = next(batch_generator)
       numpy.testing.assert_array_equal(x, input_x[i].reshape(1,3))
@@ -103,7 +103,7 @@ class TestTfUtils(unittest.TestCase):
   def test_generate_batch_sparse_matrix(self):
     input_x = scipy.sparse.csr_matrix([[3, 0, 0],[9, 4, 0],[0, 0, 2],[7, 9, 6]])
     input_y = numpy.array([1, 3, 5, 11])
-    batch_generator = tf_utils.generate_batch(1, 4, 3, input_x, input_y)
+    batch_generator = tf_utils.generate_batch(1, input_x, input_y)
     for i in range(input_x.shape[0]):
       x, y = next(batch_generator)
       numpy.testing.assert_array_equal(x, input_x.getrow(i).toarray())

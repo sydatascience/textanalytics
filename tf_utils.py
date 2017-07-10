@@ -1,5 +1,6 @@
 """Library of functions for use with tensorflow notebooks."""
 import numpy
+import math
 import scipy
 import sklearn
 import nltk
@@ -72,14 +73,11 @@ def unison_shuffled_copies(x, y):
 
 
 # Function to generate a training batch.
-def generate_batch(batch_size, number_of_batches, max_document_length,
-                   input_data, input_labels):
+def generate_batch(batch_size, input_data, input_labels):
   """Creates a generator that generates batches of specified size from the data.
 
   Args:
     batch_size: int, what size batch to use.
-    number_of_batches: int, how many batches are generator should provide.
-    max_document_length: int, how long the longest input document was.
     input_data: X data values.
     input_labels: y data labels.
   Returns:
@@ -89,6 +87,7 @@ def generate_batch(batch_size, number_of_batches, max_document_length,
     shape=(batch_size, input_data.shape[1]), dtype=numpy.float32)
   labels = numpy.ndarray(shape=(batch_size, 1), dtype=numpy.float32)
   batch_index = 0
+  number_of_batches = math.floor(input_data.shape[0]/batch_size)
   while batch_index < number_of_batches:
     for element_index in range(batch_size):
       # Prevents overflow.
